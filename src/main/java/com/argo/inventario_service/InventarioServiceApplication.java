@@ -7,6 +7,7 @@ import com.argo.inventario_service.producto.domain.repository.CodigoListNuevo;
 import com.argo.inventario_service.producto.domain.repository.IProduct;
 import org.checkerframework.checker.signature.qual.IdentifierOrArray;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -32,10 +33,11 @@ import java.util.stream.Collectors;
 @EnableFeignClients
 @EnableEurekaClient
 @EnableAsync
-@SpringBootApplication
 @EnableScheduling
 @EnableDiscoveryClient
+@SpringBootApplication
 public class InventarioServiceApplication implements CommandLineRunner {
+
 
 
 
@@ -49,86 +51,6 @@ public class InventarioServiceApplication implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
-
-        List<ProductoAlmacen> producto = this.iProduct.getProducto(3);
-        List<ProductoAlmacen> producto2 = new ArrayList<>(producto);
-
-
-        AtomicReference<Integer> index=new AtomicReference<>(0);
-        AtomicReference<List<ProductoAlmacen>> valoresRepetidos=new AtomicReference<>();
-        valoresRepetidos.set(new ArrayList<>());
-        List<List<ProductoAlmacen>> listaFiltrada = producto.stream().map(productoAlmacen -> {
-
-            List<ProductoAlmacen> collect1 = producto2.stream().filter(pros -> pros.getId().getIndex().equals(productoAlmacen.getId().getIndex()) && pros.getId().getCodigo().equals(productoAlmacen.getId().getCodigo())).collect(Collectors.toList());
-
-            if(!valoresRepetidos.get().contains(productoAlmacen)){
-                System.out.println("no lo contiene");
-                valoresRepetidos.get().addAll(collect1);
-                return collect1;
-            }
-            return null;
-
-        }).filter(Objects::nonNull).collect(Collectors.toList());
-
-        List<CodigoListNuevo> listaNueva = listaFiltrada.stream().map(productoAlmacens -> {
-
-            int stock = productoAlmacens.stream().mapToInt(ProductoAlmacen::getStock).sum();
-            ProductoAlmacen productoAlmacen = productoAlmacens.get(productoAlmacens.size() - 1);
-
-
-            return new CodigoListNuevo() {
-                @Override
-                public String getCodigo() {
-                    return productoAlmacen.getId().getCodigo().getCodigo();
-                }
-
-                @Override
-                public String getDescripcion() {
-                    return productoAlmacen.getId().getCodigo().getDescripcion();
-                }
-
-                @Override
-                public String getModelo() {
-                    return productoAlmacen.getId().getCodigo().getModelo();
-                }
-
-                @Override
-                public String getMarca() {
-                    return productoAlmacen.getId().getCodigo().getMarca();
-                }
-
-                @Override
-                public String getColor() {
-                    return productoAlmacen.getId().getCodigo().getColor();
-                }
-
-                @Override
-                public String getTalla() {
-                    return productoAlmacen.getId().getCodigo().getTalla();
-                }
-
-                @Override
-                public String getTipo() {
-                    return productoAlmacen.getId().getCodigo().getTipo().getTipo();
-
-                }
-
-                @Override
-                public BigDecimal getPrecio() {
-                    return productoAlmacen.getId().getCodigo().getPrecioUnitario();
-                }
-
-                @Override
-                public int getCantidad() {
-                    return stock;
-                }
-            };
-
-        }).filter(Objects::nonNull).collect(Collectors.toList());
-
-        listaNueva.forEach(codigoListNuevo -> {
-            System.out.println(codigoListNuevo.getCantidad());
-        });
 
 
 
